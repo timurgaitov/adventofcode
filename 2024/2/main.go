@@ -1,40 +1,26 @@
 package main
 
 import (
-	"bufio"
+	"adventofcode/utils"
 	"fmt"
-	"os"
 	"slices"
-	"strconv"
-	"strings"
 )
 
 func main() {
-	file, err := os.Open("input.txt")
-	defer func() { _ = file.Close() }()
-	if err != nil {
-		panic(err)
-	}
-	reader := bufio.NewReader(file)
+	lines := utils.Lines("input.txt")
 
 	count := 0
-	for line, _, err := reader.ReadLine(); err == nil; line, _, err = reader.ReadLine() {
-		strs := strings.Split(string(line), " ")
-		nums := make([]int, 0, len(strs))
-		for _, s := range strs {
-			n, _ := strconv.Atoi(s)
-			nums = append(nums, n)
-		}
-
+	for _, line := range lines {
+		nums := utils.Numbers(line, " ")
 		for without := 0; without < len(nums); without++ {
-			subNums := append(slices.Clone(nums[:without]), nums[without+1:]...)
-			if isStable(subNums) {
+			nums2 := slices.Concat(nums[:without], nums[without+1:])
+			if isStable(nums2) {
 				count++
 				break
 			}
 		}
 	}
-	fmt.Println(count)
+	fmt.Println(count) // part 1: 486, part 2: 540
 }
 
 func isStable(nums []int) bool {
@@ -54,10 +40,7 @@ func isStable(nums []int) bool {
 				return false
 			}
 		}
-		diff := nums[i] - prev
-		if diff < 0 {
-			diff *= -1
-		}
+		diff := utils.Abs(nums[i] - prev)
 		if diff < 1 || diff > 3 {
 			return false
 		}
