@@ -1,14 +1,14 @@
 package main
 
 import (
-	"adventofcode/utils"
+	"adventofcode/u"
 	"fmt"
 	"slices"
 )
 
 func main() {
-	str := utils.ReadFileStr("input.txt")
-	nums := utils.Numbers(str, `\s+`)
+	str := u.ReadFileStr("input.txt")
+	nums := u.Nums(str, `\s+`)
 	left := make([]int, 0, len(nums)/2)
 	right := make([]int, 0, len(nums)/2)
 	for i, num := range nums {
@@ -22,7 +22,7 @@ func main() {
 	slices.Sort(right)
 	sum := 0
 	for i := 0; i < len(left); i++ {
-		sum += utils.Abs(left[i] - right[i])
+		sum += u.Abs(left[i] - right[i])
 	}
 	fmt.Println(sum)
 

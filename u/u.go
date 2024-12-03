@@ -1,4 +1,4 @@
-package utils
+package u
 
 import (
 	"bufio"
@@ -30,7 +30,7 @@ func ReadFileLines(filename string) []string {
 	return lines
 }
 
-func Numbers(str string, sepPattern string) []int {
+func Nums(str string, sepPattern string) []int {
 	re := regexp.MustCompile(sepPattern)
 	numsStrs := re.Split(strings.Trim(str, " \r\n"), -1)
 	nums := make([]int, 0)
@@ -40,7 +40,7 @@ func Numbers(str string, sepPattern string) []int {
 	return nums
 }
 
-func RegexpGroups(pattern string, str string) [][]string {
+func RegexpGroups(str string, pattern string) [][]string {
 	re := regexp.MustCompile(pattern)
 	all := re.FindAllStringSubmatch(str, -1)
 	result := make([][]string, 0, len(all))
