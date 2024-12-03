@@ -30,6 +30,11 @@ func ReadFileLines(filename string) []string {
 	return lines
 }
 
+func Strs(str string, sepPattern string) []string {
+	re := regexp.MustCompile(sepPattern)
+	return re.Split(strings.Trim(str, " \r\n"), -1)
+}
+
 func Nums(str string, sepPattern string) []int {
 	re := regexp.MustCompile(sepPattern)
 	numsStrs := re.Split(strings.Trim(str, " \r\n"), -1)
