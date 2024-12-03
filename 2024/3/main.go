@@ -14,12 +14,21 @@ func main() {
 	}
 	str := string(bytes)
 
-	re := regexp.MustCompile(`mul\((\d+),(\d+)\)`)
+	re := regexp.MustCompile(`(do\(\)|don't\(\)|mul\((\d+),(\d+)\))`)
 	strs := re.FindAllStringSubmatch(str, -1)
 	res := 0
+	do := true
 	for _, s := range strs {
-		n1, _ := strconv.Atoi(s[1])
-		n2, _ := strconv.Atoi(s[2])
+		if s[0] == "do()" {
+			do = true
+		} else if s[0] == "don't()" {
+			do = false
+		}
+		if !do {
+			continue
+		}
+		n1, _ := strconv.Atoi(s[2])
+		n2, _ := strconv.Atoi(s[3])
 		res += n1 * n2
 	}
 	fmt.Println(res)
