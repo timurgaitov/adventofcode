@@ -1,26 +1,31 @@
 package main
 
 import (
-	"bufio"
+	"adventofcode/utils"
 	"fmt"
-	"os"
 	"slices"
 )
 
 func main() {
-	left, right := readNums()
+	str := utils.ReadFileStr("input.txt")
+	nums := utils.Numbers(str, `\s+`)
+	left := make([]int, 0, len(nums)/2)
+	right := make([]int, 0, len(nums)/2)
+	for i, num := range nums {
+		if i%2 == 0 {
+			left = append(left, num)
+		} else {
+			right = append(right, num)
+		}
+	}
 	slices.Sort(left)
 	slices.Sort(right)
-	if len(left) != len(right) {
-		panic("lengths do not match")
-	}
-	// part 1
 	sum := 0
 	for i := 0; i < len(left); i++ {
-		sum += distance(left[i], right[i])
+		sum += utils.Abs(left[i] - right[i])
 	}
 	fmt.Println(sum)
-	// part 2
+
 	sim := 0
 	for l, r := 0, 0; l < len(left) && r < len(right); {
 		countL := 0
@@ -36,41 +41,4 @@ func main() {
 		sim += cur * countL * countR
 	}
 	fmt.Println(sim)
-}
-
-func distance(a, b int) int {
-	if a > b {
-		return a - b
-	}
-	return b - a
-}
-
-func readNums() (left []int, right []int) {
-	file, err := os.Open("input.txt")
-	if err != nil {
-		panic(err)
-	}
-	scan := bufio.NewScanner(file)
-	scan.Split(bufio.ScanWords)
-	r := false
-	for scan.Scan() {
-		num := bytesToNum(scan.Bytes())
-		if r {
-			right = append(right, num)
-		} else {
-			left = append(left, num)
-		}
-		r = !r
-	}
-	return
-}
-
-func bytesToNum(bytes []byte) int {
-	var num int
-	cur := 1
-	for i := len(bytes) - 1; i >= 0; i-- {
-		num += int(bytes[i]-'0') * cur
-		cur *= 10
-	}
-	return num
 }

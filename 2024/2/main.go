@@ -7,8 +7,7 @@ import (
 )
 
 func main() {
-	lines := utils.Lines("input.txt")
-
+	lines := utils.ReadFileLines("input.txt")
 	count := 0
 	for _, line := range lines {
 		nums := utils.Numbers(line, " ")
@@ -20,7 +19,7 @@ func main() {
 			}
 		}
 	}
-	fmt.Println(count) // part 1: 486, part 2: 540
+	fmt.Println(count)
 }
 
 func isStable(nums []int) bool {

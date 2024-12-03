@@ -3,11 +3,20 @@ package utils
 import (
 	"bufio"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
 
-func Lines(filename string) []string {
+func ReadFileStr(filename string) string {
+	bytes, err := os.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+	return string(bytes)
+}
+
+func ReadFileLines(filename string) []string {
 	file, err := os.Open(filename)
 	if err != nil {
 		panic(err)
@@ -21,22 +30,37 @@ func Lines(filename string) []string {
 	return lines
 }
 
-func Numbers(str string, sep string) []int {
-	parts := strings.Split(str, sep)
+func Numbers(str string, sepPattern string) []int {
+	re := regexp.MustCompile(sepPattern)
+	numsStrs := re.Split(strings.Trim(str, " \r\n"), -1)
 	nums := make([]int, 0)
-	for _, part := range parts {
-		num, err := strconv.Atoi(part)
-		if err != nil {
-			panic(err)
-		}
-		nums = append(nums, num)
+	for _, numStr := range numsStrs {
+		nums = append(nums, Num(numStr))
 	}
 	return nums
+}
+
+func RegexpGroups(pattern string, str string) [][]string {
+	re := regexp.MustCompile(pattern)
+	all := re.FindAllStringSubmatch(str, -1)
+	result := make([][]string, 0, len(all))
+	for _, groups := range all {
+		result = append(result, groups)
+	}
+	return result
 }
 
 func Abs(num int) int {
 	if num < 0 {
 		return -num
+	}
+	return num
+}
+
+func Num(str string) int {
+	num, err := strconv.Atoi(str)
+	if err != nil {
+		panic(err)
 	}
 	return num
 }
