@@ -3,6 +3,7 @@ package main
 import (
 	"adventofcode/u"
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -29,12 +30,14 @@ func main() {
 		}
 	}
 	sum := 0
+	incor := make([][]int, 0)
 UpdatesLoop:
 	for _, update := range updates {
 		for i, p := range update {
 			rul := rules[p]
 			for j := 0; j < i; j++ {
 				if _, ok := rul[update[j]]; ok {
+					incor = append(incor, update)
 					continue UpdatesLoop
 				}
 			}
@@ -42,4 +45,19 @@ UpdatesLoop:
 		sum += update[len(update)/2]
 	}
 	fmt.Println(sum)
+
+	sum2 := 0
+	for _, update := range incor {
+		sort.SliceStable(update, func(i, j int) bool {
+			if _, ok := rules[update[i]][update[j]]; ok {
+				return true
+			}
+			if _, ok := rules[update[j]][update[i]]; ok {
+				return false
+			}
+			return false
+		})
+		sum2 += update[len(update)/2]
+	}
+	fmt.Println(sum2)
 }
