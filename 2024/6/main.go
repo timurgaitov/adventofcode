@@ -84,10 +84,6 @@ func findGuard(M []string, size int) (int, int) {
 	panic("guard not found")
 }
 
-func isObstacle(M []string, i, j, size int) bool {
-	return !outOfMap(i, j, size) && M[i][j] == '#'
-}
-
 func outOfMap(i, j, size int) bool {
 	return i < 0 || j < 0 || i >= size || j >= size
 }
