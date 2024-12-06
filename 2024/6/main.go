@@ -3,6 +3,8 @@ package main
 import (
 	"adventofcode/u"
 	"fmt"
+	"sync"
+	"sync/atomic"
 )
 
 type dir struct {
@@ -44,32 +46,50 @@ func main() {
 	fmt.Println(len(visited))
 
 	// part 2
-	count := 0
-	for obsI := 0; obsI < size; obsI++ {
-		for obsJ := 0; obsJ < size; obsJ++ {
-			visitedTurns := map[turn]struct{}{}
-			dir2 := 0
-			prevDir2 := 0
-			for i, j := guardI, guardJ; !outOfMap(i, j, size); {
-				if M[i][j] == '#' || i == obsI && j == obsJ {
-					i, j = i-dirs[dir2].i, j-dirs[dir2].j
-					dir2 = (dir2 + 1) % 4
-					continue
-				}
-				if dir2 != prevDir2 {
-					prevDir2 = dir2
-					tur := turn{i: i, j: j, dir: dirs[dir2]}
-					if _, ok := visitedTurns[tur]; ok {
-						count++
-						break
-					}
-					visitedTurns[tur] = struct{}{}
-				}
-				i, j = i+dirs[dir2].i, j+dirs[dir2].j
+	conur := 12
+	obsCh := make(chan dir)
+	count := atomic.Int64{}
+	wg := &sync.WaitGroup{}
+	wg.Add(conur)
+
+	go func() {
+		for obsI := 0; obsI < size; obsI++ {
+			for obsJ := 0; obsJ < size; obsJ++ {
+				obsCh <- dir{i: obsI, j: obsJ}
 			}
 		}
+		close(obsCh)
+	}()
+
+	for range conur {
+		go func() {
+			defer wg.Done()
+			for obs := range obsCh {
+				visitedTurns := map[turn]struct{}{}
+				dir2 := 0
+				prevDir2 := 0
+				for i, j := guardI, guardJ; !outOfMap(i, j, size); {
+					if M[i][j] == '#' || i == obs.i && j == obs.j {
+						i, j = i-dirs[dir2].i, j-dirs[dir2].j
+						dir2 = (dir2 + 1) % 4
+						continue
+					}
+					if dir2 != prevDir2 {
+						prevDir2 = dir2
+						tur := turn{i: i, j: j, dir: dirs[dir2]}
+						if _, ok := visitedTurns[tur]; ok {
+							count.Add(1)
+							break
+						}
+						visitedTurns[tur] = struct{}{}
+					}
+					i, j = i+dirs[dir2].i, j+dirs[dir2].j
+				}
+			}
+		}()
 	}
-	fmt.Println(count)
+	wg.Wait()
+	fmt.Println(count.Load())
 }
 
 func findGuard(M []string, size int) (int, int) {
