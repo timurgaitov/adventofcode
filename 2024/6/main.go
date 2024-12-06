@@ -9,6 +9,11 @@ type dir struct {
 	i, j int
 }
 
+type turn struct {
+	i, j int
+	dir  dir
+}
+
 func main() {
 	M := u.ReadFileLines("input.txt")
 	if len(M) != len(M[0]) {
@@ -23,20 +28,49 @@ func main() {
 		{0, -1},
 	}
 
+	guardI, guardJ := findGuard(M, size)
+
 	visited := make(map[dir]struct{})
-	i, j := findGuard(M, size)
 	curDir := 0
-	for {
-		if outOfMap(i, j, size) {
-			break
+	for i, j := guardI, guardJ; !outOfMap(i, j, size); {
+		for M[i][j] == '#' {
+			i, j = i-dirs[curDir].i, j-dirs[curDir].j
+			curDir = (curDir + 1) % 4
+			continue
 		}
 		visited[dir{i, j}] = struct{}{}
-		for !outOfMap(i+dirs[curDir].i, j+dirs[curDir].j, size) && M[i+dirs[curDir].i][j+dirs[curDir].j] == '#' {
-			curDir = (curDir + 1) % 4
-		}
 		i, j = i+dirs[curDir].i, j+dirs[curDir].j
 	}
 	fmt.Println(len(visited))
+
+	// part 2
+	count := 0
+	for obsI := 0; obsI < size; obsI++ {
+		for obsJ := 0; obsJ < size; obsJ++ {
+			visitedTurns := map[turn]struct{}{}
+			curDir = 0
+			for i, j := guardI, guardJ; !outOfMap(i, j, size); {
+				var tur turn
+				turned := false
+				for M[i][j] == '#' || i == obsI && j == obsJ {
+					turned = true
+					i, j = i-dirs[curDir].i, j-dirs[curDir].j
+					curDir = (curDir + 1) % 4
+					tur = turn{i: i, j: j, dir: dirs[curDir]}
+					i, j = i+dirs[curDir].i, j+dirs[curDir].j
+				}
+				if turned {
+					if _, ok := visitedTurns[tur]; ok {
+						count++
+						break
+					}
+					visitedTurns[tur] = struct{}{}
+				}
+				i, j = i+dirs[curDir].i, j+dirs[curDir].j
+			}
+		}
+	}
+	fmt.Println(count)
 }
 
 func findGuard(M []string, size int) (int, int) {
@@ -48,6 +82,10 @@ func findGuard(M []string, size int) (int, int) {
 		}
 	}
 	panic("guard not found")
+}
+
+func isObstacle(M []string, i, j, size int) bool {
+	return !outOfMap(i, j, size) && M[i][j] == '#'
 }
 
 func outOfMap(i, j, size int) bool {
