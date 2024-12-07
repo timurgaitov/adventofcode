@@ -3,16 +3,11 @@ package main
 import (
 	"adventofcode/u"
 	"fmt"
-	"gonum.org/v1/gonum/stat/combin"
+	"iter"
+	"slices"
 	"sync"
 	"sync/atomic"
 )
-
-var availableOps = []op{
-	add{},
-	mul{},
-	concat{},
-}
 
 type line struct {
 	res  int
@@ -65,15 +60,11 @@ func main() {
 		go func() {
 			defer wg.Done()
 			for ln := range lineCh {
-				gen := combin.NewCartesianGenerator(lens[:len(ln.nums)])
-				opsBuf := make([]int, len(ln.nums))
 			GenLoop:
-				for gen.Next() {
-					ops := gen.Product(opsBuf)
-
+				for ops := range gen(len(ln.nums)) {
 					r := ln.nums[0]
 					for i := 1; i < len(ln.nums); i++ {
-						r = availableOps[ops[i-1]].Eval(r, ln.nums[i])
+						r = operators[ops[i-1]](r, ln.nums[i])
 					}
 					if r != ln.res {
 						continue
@@ -99,24 +90,44 @@ func recur(result int, nums []int, depth int, cur int) int {
 	return recur(result, nums, depth+1, cur+nums[depth]) + recur(result, nums, depth+1, cur*nums[depth])
 }
 
-type op interface {
-	Eval(x, y int) int
+func gen(n int) iter.Seq[[]int] {
+	return func(yield func([]int) bool) {
+		cur := make([]int, n)
+		for {
+			if !yield(slices.Clone(cur)) {
+				break
+			}
+			mem := 1
+			for i := n - 1; i >= 0; i-- {
+				cur[i] += mem
+				mem--
+				if cur[i] < len(operators) {
+					break
+				}
+				cur[i] = 0
+				mem++
+			}
+			if mem == 1 {
+				break
+			}
+		}
+	}
 }
 
-type add struct{}
+var operators = []func(x, y int) int{
+	add,
+	mul,
+	concat,
+}
 
-func (_ add) Eval(x, y int) int {
+func add(x, y int) int {
 	return x + y
 }
 
-type mul struct{}
-
-func (_ mul) Eval(x, y int) int {
+func mul(x, y int) int {
 	return x * y
 }
 
-type concat struct{}
-
-func (_ concat) Eval(x, y int) int {
+func concat(x, y int) int {
 	return u.Num(fmt.Sprintf("%d%d", x, y))
 }
