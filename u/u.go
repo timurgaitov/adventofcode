@@ -38,7 +38,7 @@ func Strs(str string, sepPattern string) []string {
 func Nums(str string, sepPattern string) []int {
 	re := regexp.MustCompile(sepPattern)
 	numsStrs := re.Split(strings.Trim(str, " \r\n"), -1)
-	nums := make([]int, 0)
+	nums := make([]int, 0, len(numsStrs))
 	for _, numStr := range numsStrs {
 		nums = append(nums, Num(numStr))
 	}

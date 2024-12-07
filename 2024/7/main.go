@@ -3,50 +3,89 @@ package main
 import (
 	"adventofcode/u"
 	"fmt"
-	"slices"
+	"gonum.org/v1/gonum/stat/combin"
+	"sync"
+	"sync/atomic"
 )
+
+var availableOps = []op{
+	add{},
+	mul{},
+	concat{},
+}
+
+type line struct {
+	res  int
+	nums []int
+}
 
 func main() {
 	lines := u.ReadFileLines("input.txt")
 
-	inp := make(map[int][]int)
+	inp := make([]line, 0, len(lines))
+	maxNums := 0
 	for _, lin := range lines {
 		split := u.Strs(lin, ": ")
-		result, nums := u.Num(split[0]), u.Nums(split[1], " ")
-		inp[result] = nums
+		res, nums := u.Num(split[0]), u.Nums(split[1], " ")
+		inp = append(inp, line{res: res, nums: nums})
+		if len(nums) > maxNums {
+			maxNums = len(nums)
+		}
+	}
+
+	lens := make([]int, 0, maxNums)
+	for range maxNums {
+		lens = append(lens, 3)
 	}
 
 	sum := 0
-	for res, nums := range inp {
-		if recur(res, nums, 0, 0) > 0 {
-			sum += res
+	for _, ln := range inp {
+		if recur(ln.res, ln.nums, 0, 0) > 0 {
+			sum += ln.res
 		}
 	}
 	fmt.Println(sum)
 
 	// part 2
-	sum2 := 0
-	for res, nums := range inp {
-		opN := len(nums) - 1
-		buf := make([]op, opN)
-		coll := collector{}
-		genOps(opN, buf, 0, &coll)
+	sum2 := atomic.Int64{}
 
-	GenLoop:
-		for _, ops := range coll.combs {
-			r := nums[0]
-			for i := 1; i < len(nums); i++ {
-				r = ops[i-1].Eval(r, nums[i])
-			}
-			if r != res {
-				continue
-			}
-			sum2 += r
-			break GenLoop
+	concur := 12
+	lineCh := make(chan line)
+	wg := sync.WaitGroup{}
+	wg.Add(concur)
+
+	go func() {
+		for _, ln := range inp {
+			lineCh <- ln
 		}
+		close(lineCh)
+	}()
+
+	for range concur {
+		go func() {
+			defer wg.Done()
+			for ln := range lineCh {
+				gen := combin.NewCartesianGenerator(lens[:len(ln.nums)])
+				opsBuf := make([]int, len(ln.nums))
+			GenLoop:
+				for gen.Next() {
+					ops := gen.Product(opsBuf)
+
+					r := ln.nums[0]
+					for i := 1; i < len(ln.nums); i++ {
+						r = availableOps[ops[i-1]].Eval(r, ln.nums[i])
+					}
+					if r != ln.res {
+						continue
+					}
+					sum2.Add(int64(r))
+					break GenLoop
+				}
+			}
+		}()
 	}
-	// wrong 61561126041523
-	fmt.Println(sum2)
+	wg.Wait()
+	fmt.Println(sum2.Load())
 }
 
 func recur(result int, nums []int, depth int, cur int) int {
@@ -58,23 +97,6 @@ func recur(result int, nums []int, depth int, cur int) int {
 	}
 
 	return recur(result, nums, depth+1, cur+nums[depth]) + recur(result, nums, depth+1, cur*nums[depth])
-}
-
-var opt = []op{add{}, mul{}, concat{}}
-
-func genOps(n int, buf []op, depth int, coll *collector) {
-	if depth == n {
-		coll.combs = append(coll.combs, slices.Clone(buf))
-		return
-	}
-	for i := 0; i < len(opt); i++ {
-		buf[depth] = opt[i]
-		genOps(n, buf, depth+1, coll)
-	}
-}
-
-type collector struct {
-	combs [][]op
 }
 
 type op interface {
