@@ -18,19 +18,10 @@ func main() {
 	lines := u.ReadFileLines("input.txt")
 
 	inp := make([]line, 0, len(lines))
-	maxNums := 0
 	for _, lin := range lines {
 		split := u.Strs(lin, ": ")
 		res, nums := u.Num(split[0]), u.Nums(split[1], " ")
 		inp = append(inp, line{res: res, nums: nums})
-		if len(nums) > maxNums {
-			maxNums = len(nums)
-		}
-	}
-
-	lens := make([]int, 0, maxNums)
-	for range maxNums {
-		lens = append(lens, 3)
 	}
 
 	sum := 0
