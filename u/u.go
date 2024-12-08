@@ -30,6 +30,20 @@ func ReadFileLines(filename string) []string {
 	return lines
 }
 
+func ReadCharMap(filename string) [][]byte {
+	file, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+	defer func() { _ = file.Close() }()
+	lines := make([][]byte, 0)
+	scan := bufio.NewScanner(file)
+	for scan.Scan() {
+		lines = append(lines, scan.Bytes())
+	}
+	return lines
+}
+
 func Strs(str string, sepPattern string) []string {
 	re := regexp.MustCompile(sepPattern)
 	return re.Split(strings.Trim(str, " \r\n"), -1)
