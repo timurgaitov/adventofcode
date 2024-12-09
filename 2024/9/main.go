@@ -3,111 +3,81 @@ package main
 import (
 	"adventofcode/u"
 	"fmt"
-	"slices"
 )
+
+const empty = -1
 
 func main() {
 	str := u.ReadFileStr("input.txt")
-	unzip := make([]string, 0)
-	cur := 0
-	for i, ch := range str {
-		if i%2 == 0 {
-			for range ch - '0' {
-				unzip = append(unzip, fmt.Sprintf("%d", cur))
-			}
-		} else {
-			for range ch - '0' {
-				unzip = append(unzip, ".")
-			}
-			cur++
-		}
-	}
-	unzip2 := slices.Clone(unzip)
-	//fmt.Println(strings.Join(unzip, ""))
+
+	unz := unzip(str)
 	ins := 0
 Outer:
-	for i := len(unzip) - 1; i >= 0; i-- {
-		if unzip[i] == "." {
+	for i := len(unz) - 1; i >= 0; i-- {
+		if unz[i] == empty {
 			continue
 		}
-		for unzip[ins] != "." {
+		for unz[ins] != empty {
 			ins++
-			if ins >= len(unzip) {
+			if ins >= len(unz) {
 				break Outer
 			}
 		}
-		empty := true
-		for j := ins; j < len(unzip); j++ {
-			if unzip[j] != "." {
-				empty = false
+		emp := true
+		for j := ins; j < len(unz); j++ {
+			if unz[j] != empty {
+				emp = false
 				break
 			}
 		}
-		if empty {
+		if emp {
 			break
 		}
-		unzip[ins] = unzip[i]
-		unzip[i] = "."
+		unz[ins] = unz[i]
+		unz[i] = empty
 	}
-	res := unzip[:ins]
-	//fmt.Println(strings.Join(res, ""))
+	res := unz[:ins]
 
 	checkSum := 0
-	for i, ch := range res {
-		checkSum += i * u.Num(ch)
+	for i, n := range res {
+		checkSum += i * n
 	}
-	//fmt.Println(checkSum)
+	fmt.Println(checkSum)
 
 	// part 2
-	files := make([]file, 0)
-	cur2 := unzip2[0]
-	pos := 0
-	ln := 1
-	//fmt.Println(unzip2)
-
-	for i := 1; i < len(unzip2); i++ {
-		if unzip2[i] != cur2 {
-			id := -1
-			if cur2 != "." {
-				id = u.Num(cur2)
-			}
-			files = append(files, file{pos: pos, id: id, len: ln})
-			cur2 = unzip2[i]
-			pos = i
-			ln = 0
-		}
-		ln++
-	}
-	id := -1
-	if cur2 != "." {
-		id = u.Num(cur2)
-	}
-	files = append(files, file{pos: pos, id: id, len: ln})
+	files := readFiles(str)
 
 	var res2 []file
-
 	for i := 0; i < len(files); i++ {
-		if files[i].id != -1 {
+		if files[i].id != empty {
 			res2 = append(res2, files[i])
 			continue
 		}
-		emptySpace := files[i]
 
-		for j := len(files) - 1; j >= 0; j-- {
-			if files[j].id == -1 {
+		for j := len(files) - 1; j > i; j-- {
+			if files[j].id == empty {
 				continue
 			}
-			if files[j].len <= emptySpace.len {
-				files[j].pos = emptySpace.pos
-				res2 = append(res2, files[j])
-				emptySpace.len -= files[j].len
-				emptySpace.pos += files[j].len
-				files[j] = file{id: -1, len: -1, pos: -1}
+			if files[j].len <= files[i].len {
+				res2 = append(res2, file{
+					pos: files[i].pos,
+					id:  files[j].id,
+					len: files[j].len,
+				})
+
+				files[i].len -= files[j].len
+				files[i].pos += files[j].len
+
+				files[j] = file{
+					pos: files[j].pos,
+					id:  empty,
+					len: files[j].len,
+				}
 			}
 		}
 	}
 
-	//fmt.Println(res2)
+	//printRes2(res2)
 
 	checkSum2 := 0
 	for _, r := range res2 {
@@ -116,11 +86,78 @@ Outer:
 		}
 	}
 	fmt.Println(checkSum2)
-	//10733824823427 wrong
+}
+
+func printRes2(files []file) {
+	prevNotEmpty := 0
+	for _, f := range files {
+		for range f.pos - prevNotEmpty {
+			fmt.Print(".")
+		}
+		for range f.len {
+			fmt.Print(f.id)
+		}
+		prevNotEmpty = f.pos + f.len
+	}
+	fmt.Println()
+}
+
+func readFiles(str string) []file {
+	unz := unzip(str)
+	files := make([]file, 0)
+	cur2 := unz[0]
+	pos := 0
+	ln := 1
+
+	for i := 1; i < len(unz); i++ {
+		if unz[i] != cur2 {
+			id := -1
+			if cur2 != empty {
+				id = cur2
+			}
+			files = append(files, file{pos: pos, id: id, len: ln})
+			cur2 = unz[i]
+			pos = i
+			ln = 0
+		}
+		ln++
+	}
+	id := -1
+	if cur2 != empty {
+		id = cur2
+	}
+	files = append(files, file{pos: pos, id: id, len: ln})
+	return files
+}
+
+func unzip(str string) []int {
+	res := make([]int, 0)
+	cur := 0
+	for i, ch := range str {
+		if i%2 == 0 {
+			for range ch - '0' {
+				res = append(res, cur)
+			}
+		} else {
+			for range ch - '0' {
+				res = append(res, empty)
+			}
+			cur++
+		}
+	}
+	return res
 }
 
 type file struct {
 	pos int
 	id  int
 	len int
+}
+
+func (f file) String() string {
+	id := fmt.Sprintf("%d", f.id)
+	if id == "-1" {
+		id = "."
+	}
+	return fmt.Sprintf("(%s, [%d, %d])", id, f.pos, f.pos+f.len-1)
 }
