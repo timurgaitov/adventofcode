@@ -3,7 +3,7 @@ package main
 import (
 	"adventofcode/u"
 	"fmt"
-	"strings"
+	"slices"
 )
 
 func main() {
@@ -22,7 +22,8 @@ func main() {
 			cur++
 		}
 	}
-	fmt.Println(strings.Join(unzip, ""))
+	unzip2 := slices.Clone(unzip)
+	//fmt.Println(strings.Join(unzip, ""))
 	ins := 0
 Outer:
 	for i := len(unzip) - 1; i >= 0; i-- {
@@ -49,11 +50,77 @@ Outer:
 		unzip[i] = "."
 	}
 	res := unzip[:ins]
-	fmt.Println(strings.Join(res, ""))
+	//fmt.Println(strings.Join(res, ""))
 
 	checkSum := 0
 	for i, ch := range res {
 		checkSum += i * u.Num(ch)
 	}
-	fmt.Println(checkSum)
+	//fmt.Println(checkSum)
+
+	// part 2
+	files := make([]file, 0)
+	cur2 := unzip2[0]
+	pos := 0
+	ln := 1
+	//fmt.Println(unzip2)
+
+	for i := 1; i < len(unzip2); i++ {
+		if unzip2[i] != cur2 {
+			id := -1
+			if cur2 != "." {
+				id = u.Num(cur2)
+			}
+			files = append(files, file{pos: pos, id: id, len: ln})
+			cur2 = unzip2[i]
+			pos = i
+			ln = 0
+		}
+		ln++
+	}
+	id := -1
+	if cur2 != "." {
+		id = u.Num(cur2)
+	}
+	files = append(files, file{pos: pos, id: id, len: ln})
+
+	var res2 []file
+
+	for i := 0; i < len(files); i++ {
+		if files[i].id != -1 {
+			res2 = append(res2, files[i])
+			continue
+		}
+		emptySpace := files[i]
+
+		for j := len(files) - 1; j >= 0; j-- {
+			if files[j].id == -1 {
+				continue
+			}
+			if files[j].len <= emptySpace.len {
+				files[j].pos = emptySpace.pos
+				res2 = append(res2, files[j])
+				emptySpace.len -= files[j].len
+				emptySpace.pos += files[j].len
+				files[j] = file{id: -1, len: -1, pos: -1}
+			}
+		}
+	}
+
+	//fmt.Println(res2)
+
+	checkSum2 := 0
+	for _, r := range res2 {
+		for j := range r.len {
+			checkSum2 += r.id * (r.pos + j)
+		}
+	}
+	fmt.Println(checkSum2)
+	//10733824823427 wrong
+}
+
+type file struct {
+	pos int
+	id  int
+	len int
 }
