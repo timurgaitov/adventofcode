@@ -44,6 +44,25 @@ func ReadCharMap(filename string) [][]byte {
 	return lines
 }
 
+func ReadIntMap(filename string) [][]int {
+	file, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+	defer func() { _ = file.Close() }()
+	lines := make([][]int, 0)
+	scan := bufio.NewScanner(file)
+	for scan.Scan() {
+		bytes := scan.Bytes()
+		nums := make([]int, 0)
+		for _, b := range bytes {
+			nums = append(nums, int(b-'0'))
+		}
+		lines = append(lines, nums)
+	}
+	return lines
+}
+
 func Strs(str string, sepPattern string) []string {
 	re := regexp.MustCompile(sepPattern)
 	return re.Split(strings.Trim(str, " \r\n"), -1)
