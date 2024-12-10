@@ -9,26 +9,31 @@ import (
 func main() {
 	m := u.ReadIntMap("input.txt")
 	sum := 0
+	sum2 := 0
 	for i, line := range m {
 		for j, num := range line {
 			if num != 0 {
 				continue
 			}
-			trailhead := dfs(m, i, j)
-			sum += trailhead
+			score, rating := dfs(m, i, j)
+			sum += score
+			sum2 += rating
 		}
 	}
 	fmt.Println(sum)
+	// part 2
+	fmt.Println(sum2)
 }
 
 var dirs = []pos{{i: -1, j: 0}, {i: 1, j: 0}, {i: 0, j: -1}, {i: 0, j: 1}}
 
-func dfs(m [][]int, i, j int) int {
+func dfs(m [][]int, i, j int) (int, int) {
 	stack := make([]pos, 10000)
 	stackCur := 0
 	stack[stackCur] = pos{i: i, j: j, trace: []pos{{i: i, j: j}}}
 
 	count := make(map[lwpos]struct{}, 0)
+	count2 := 0
 
 	for stackCur >= 0 {
 		cur := stack[stackCur]
@@ -44,8 +49,9 @@ func dfs(m [][]int, i, j int) int {
 				continue
 			}
 			if m[cand.i][cand.j] == 9 {
-				printTrace(m, cand.trace)
+				//printTrace(m, cand.trace)
 				count[lwpos{cand.i, cand.j}] = struct{}{}
+				count2++
 				continue
 			}
 
@@ -53,7 +59,7 @@ func dfs(m [][]int, i, j int) int {
 			stack[stackCur] = cand
 		}
 	}
-	return len(count)
+	return len(count), count2
 }
 
 func printTrace(m [][]int, trace []pos) {
