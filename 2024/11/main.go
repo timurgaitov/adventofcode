@@ -8,23 +8,36 @@ import (
 func main() {
 	nums := u.Nums(u.ReadFileStr("input.txt"), " ")
 
-	for blink := 0; blink < 25; blink++ {
-		nextNums := make([]int, 0)
-		for _, n := range nums {
-			if n == 0 {
-				nextNums = append(nextNums, 1)
-				continue
-			}
-
-			str := fmt.Sprintf("%d", n)
-			if len(str)%2 == 0 {
-				nextNums = append(nextNums, u.Num(str[:len(str)/2]), u.Num(str[len(str)/2:]))
-				continue
-			}
-
-			nextNums = append(nextNums, n*2024)
-		}
-		nums = nextNums
+	res := 0
+	blink := 75
+	dp := make(map[nblink]int)
+	for _, num := range nums {
+		res += rec(num, blink, dp)
 	}
-	fmt.Println(len(nums))
+	fmt.Println(res)
+}
+
+type nblink struct {
+	n, blink int
+}
+
+func rec(n int, blink int, dp map[nblink]int) (res int) {
+	if blink == 0 {
+		return 1
+	}
+	if r, ok := dp[nblink{n, blink}]; ok {
+		return r
+	}
+	defer func() { dp[nblink{n, blink}] = res }()
+
+	if n == 0 {
+		return rec(1, blink-1, dp)
+	}
+
+	str := fmt.Sprintf("%d", n)
+	if len(str)%2 == 0 {
+		return rec(u.Num(str[:len(str)/2]), blink-1, dp) + rec(u.Num(str[len(str)/2:]), blink-1, dp)
+	}
+
+	return rec(n*2024, blink-1, dp)
 }
