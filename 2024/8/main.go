@@ -53,7 +53,7 @@ func main() {
 	fmt.Println(count2)
 }
 
-func markAntinodes(charMap [][]byte, resMap [][]byte, curI, curJ int) {
+func markAntinodes(charMap [][]rune, resMap [][]byte, curI, curJ int) {
 	cur := charMap[curI][curJ]
 	if cur == '.' {
 		return
@@ -75,7 +75,7 @@ func markAntinodes(charMap [][]byte, resMap [][]byte, curI, curJ int) {
 	}
 }
 
-func markAntinodes2(charMap [][]byte, resMap [][]byte, curI, curJ int) {
+func markAntinodes2(charMap [][]rune, resMap [][]byte, curI, curJ int) {
 	cur := charMap[curI][curJ]
 	if cur == '.' {
 		return

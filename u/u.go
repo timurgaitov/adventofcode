@@ -2,6 +2,9 @@ package u
 
 import (
 	"bufio"
+	"bytes"
+	"fmt"
+	"io"
 	"os"
 	"regexp"
 	"strconv"
@@ -30,33 +33,42 @@ func ReadFileLines(filename string) []string {
 	return lines
 }
 
-func ReadCharMap(filename string) [][]byte {
-	file, err := os.Open(filename)
-	if err != nil {
-		panic(err)
+func ReadCharMap(filename string) [][]rune {
+	file, err0 := os.Open(filename)
+	if err0 != nil {
+		panic(err0)
 	}
-	defer func() { _ = file.Close() }()
-	lines := make([][]byte, 0)
-	scan := bufio.NewScanner(file)
-	for scan.Scan() {
-		lines = append(lines, scan.Bytes())
-	}
-	return lines
-}
+	defer func() {
+		_ = file.Close()
+	}()
 
-func ReadCharMap2(filename string) [][]string {
-	file, err := os.Open(filename)
-	if err != nil {
-		panic(err)
-	}
-	defer func() { _ = file.Close() }()
-
-	charMap := make([][]string, 0)
+	res := make([][]rune, 0)
 	scan := bufio.NewScanner(file)
+	expectedLen := -1
 	for scan.Scan() {
-		charMap = append(charMap, Strs(scan.Text(), ""))
+		rd := bytes.NewReader(scan.Bytes())
+		if expectedLen < 0 {
+			expectedLen = rd.Len()
+		}
+		actualLen := 0
+		rs := make([]rune, 0, expectedLen)
+		for {
+			r, _, err := rd.ReadRune()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				panic(err)
+			}
+			rs = append(rs, r)
+			actualLen++
+		}
+		if actualLen != expectedLen {
+			panic(fmt.Sprintf("wrong length, expected %d, actual %d", actualLen, expectedLen))
+		}
+		res = append(res, rs)
 	}
-	return charMap
+	return res
 }
 
 func ReadIntMap(filename string) [][]int {

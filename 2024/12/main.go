@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	chM := u.ReadCharMap2("input.txt")
+	chM := u.ReadCharMap("input.txt")
 
 	q := u.NewQueue()
 	visited := make(map[u.Pos]struct{})
@@ -57,7 +57,7 @@ func main() {
 	fmt.Println(cost2)
 }
 
-func countConvexCorners(cur u.Pos, chM [][]string) (corners int) {
+func countConvexCorners(cur u.Pos, chM [][]rune) (corners int) {
 	dirs := u.DirsSqClockwise
 	for i := 0; i < len(dirs); i++ {
 		d1 := otherArea(posDir(cur, roundDir(i, dirs)), cur, chM)
@@ -69,7 +69,7 @@ func countConvexCorners(cur u.Pos, chM [][]string) (corners int) {
 	return
 }
 
-func countConcaveCorners(cur u.Pos, chM [][]string) (corners int) {
+func countConcaveCorners(cur u.Pos, chM [][]rune) (corners int) {
 	dirs := u.DirsDiagClockwise
 	for i := 0; i < len(dirs); i += 2 {
 		d1 := otherArea(posDir(cur, roundDir(i, dirs)), cur, chM)
@@ -93,7 +93,7 @@ func posDir(cur u.Pos, dir u.Pos) u.Pos {
 	}
 }
 
-func otherArea(p u.Pos, cur u.Pos, chM [][]string) bool {
+func otherArea(p u.Pos, cur u.Pos, chM [][]rune) bool {
 	return p.I < 0 || p.J < 0 || p.I >= len(chM) || p.J >= len(chM) ||
 		chM[p.I][p.J] != chM[cur.I][cur.J]
 }
