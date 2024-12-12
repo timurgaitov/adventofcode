@@ -24,7 +24,7 @@ func main() {
 
 			area := 0
 			perimeter := 0
-			corners := 0
+			sides := 0
 
 			for !q.Empty() {
 				cur := q.Remove().(u.Pos)
@@ -35,67 +35,62 @@ func main() {
 				area++
 
 				for _, dir := range u.DirsSqClockwise {
-					d := u.Pos{I: cur.I + dir.I, J: cur.J + dir.J}
-					if otherArea(d, cur, chM) {
+					pos := posDir(cur, dir)
+					if otherArea(pos, cur, chM) {
 						perimeter++
 						continue
 					}
-					q.Add(d)
+					q.Add(pos)
 				}
 
-				corn := 0
-
-				for k := 0; k < len(u.DirsSqClockwise); k++ {
-					o1 := otherArea(u.Pos{
-						I: cur.I + u.DirsSqClockwise[k].I,
-						J: cur.J + u.DirsSqClockwise[k].J,
-					}, cur, chM)
-					o2 := otherArea(u.Pos{
-						I: cur.I + u.DirsSqClockwise[(k+1)%len(u.DirsSqClockwise)].I,
-						J: cur.J + u.DirsSqClockwise[(k+1)%len(u.DirsSqClockwise)].J,
-					}, cur, chM)
-					if o1 && o2 {
-						corn++
-					}
-				}
-
-				for k := 0; k < len(u.DirsDiagClockwise); k += 2 {
-					o1 := otherArea(u.Pos{
-						I: cur.I + u.DirsDiagClockwise[k].I,
-						J: cur.J + u.DirsDiagClockwise[k].J,
-					}, cur, chM)
-					o2 := otherArea(u.Pos{
-						I: cur.I + u.DirsDiagClockwise[(k+1)%len(u.DirsDiagClockwise)].I,
-						J: cur.J + u.DirsDiagClockwise[(k+1)%len(u.DirsDiagClockwise)].J,
-					}, cur, chM)
-					o3 := otherArea(u.Pos{
-						I: cur.I + u.DirsDiagClockwise[(k+2)%len(u.DirsDiagClockwise)].I,
-						J: cur.J + u.DirsDiagClockwise[(k+2)%len(u.DirsDiagClockwise)].J,
-					}, cur, chM)
-					if !o1 && o2 && !o3 {
-						corn++
-					}
-				}
-
-				if corn > 0 {
-					z := corn
-					y := fmt.Sprintf("%v", cur)
-					x := chM[cur.I][cur.J]
-					_ = x
-					_ = y
-					_ = z
-					corners += corn
-				}
+				sides += countConvexCorners(cur, chM)
+				sides += countConcaveCorners(cur, chM)
 			}
 
-			fmt.Println(chM[start.I][start.J], area, corners)
+			//fmt.Printf("%s | area %4d | perimeter %4d | sides %4d\n", chM[start.I][start.J], area, perimeter, sides)
 			cost += perimeter * area
-			cost2 += corners * area
+			cost2 += sides * area
 		}
 	}
 
 	fmt.Println(cost)
 	fmt.Println(cost2)
+}
+
+func countConvexCorners(cur u.Pos, chM [][]string) (corners int) {
+	dirs := u.DirsSqClockwise
+	for i := 0; i < len(dirs); i++ {
+		d1 := otherArea(posDir(cur, roundDir(i, dirs)), cur, chM)
+		d2 := otherArea(posDir(cur, roundDir(i+1, dirs)), cur, chM)
+		if d1 && d2 {
+			corners++
+		}
+	}
+	return
+}
+
+func countConcaveCorners(cur u.Pos, chM [][]string) (corners int) {
+	dirs := u.DirsDiagClockwise
+	for i := 0; i < len(dirs); i += 2 {
+		d1 := otherArea(posDir(cur, roundDir(i, dirs)), cur, chM)
+		d2 := otherArea(posDir(cur, roundDir(i+1, dirs)), cur, chM)
+		d3 := otherArea(posDir(cur, roundDir(i+2, dirs)), cur, chM)
+		if !d1 && d2 && !d3 {
+			corners++
+		}
+	}
+	return
+}
+
+func roundDir(d int, dirs []u.Pos) u.Pos {
+	return dirs[d%len(dirs)]
+}
+
+func posDir(cur u.Pos, dir u.Pos) u.Pos {
+	return u.Pos{
+		I: cur.I + dir.I,
+		J: cur.J + dir.J,
+	}
 }
 
 func otherArea(p u.Pos, cur u.Pos, chM [][]string) bool {
