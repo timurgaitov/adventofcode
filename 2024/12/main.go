@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	chM := u.ReadCharMap("example.txt")
+	chM := u.ReadCharMap2("input.txt")
 
 	q := u.NewQueue()
 	visited := make(map[u.Pos]struct{})
@@ -42,7 +42,7 @@ func main() {
 				}
 			}
 
-			//fmt.Println(string(chM[start.I][start.J]), perimeter, area)
+			//fmt.Println(start.I, start.J, string(chM[start.I][start.J]), perimeter, area)
 			cost += perimeter * area
 		}
 	}

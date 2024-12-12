@@ -44,6 +44,21 @@ func ReadCharMap(filename string) [][]byte {
 	return lines
 }
 
+func ReadCharMap2(filename string) [][]string {
+	file, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+	defer func() { _ = file.Close() }()
+
+	charMap := make([][]string, 0)
+	scan := bufio.NewScanner(file)
+	for scan.Scan() {
+		charMap = append(charMap, Strs(scan.Text(), ""))
+	}
+	return charMap
+}
+
 func ReadIntMap(filename string) [][]int {
 	file, err := os.Open(filename)
 	if err != nil {
