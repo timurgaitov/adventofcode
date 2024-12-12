@@ -1,15 +1,15 @@
 package main
 
 import (
-	"adventofcode/u"
+	"adventofcode/utils"
 	"fmt"
 )
 
 func main() {
-	str := u.ReadFileStr("input.txt")
+	str := utils.ReadStr("input.txt")
 	res := 0
 	do := true
-	for _, groups := range u.RegexpGroups(str, `(do\(\)|don't\(\)|mul\((\d+),(\d+)\))`) {
+	for _, groups := range utils.RegexpGroups(str, `(do\(\)|don't\(\)|mul\((\d+),(\d+)\))`) {
 		if groups[0] == "do()" {
 			do = true
 			continue
@@ -21,7 +21,7 @@ func main() {
 		if !do {
 			continue
 		}
-		res += u.Num(groups[2]) * u.Num(groups[3])
+		res += utils.Num(groups[2]) * utils.Num(groups[3])
 	}
 	fmt.Println(res)
 }

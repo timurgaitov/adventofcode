@@ -1,12 +1,12 @@
 package main
 
 import (
-	"adventofcode/u"
+	"adventofcode/utils"
 	"fmt"
 )
 
 func main() {
-	nums := u.Nums(u.ReadFileStr("input.txt"), " ")
+	nums := utils.Nums(utils.ReadStr("input.txt"), " ")
 
 	res := 0
 	blink := 75
@@ -36,7 +36,7 @@ func rec(n int, blink int, dp map[nblink]int) (res int) {
 
 	str := fmt.Sprintf("%d", n)
 	if len(str)%2 == 0 {
-		return rec(u.Num(str[:len(str)/2]), blink-1, dp) + rec(u.Num(str[len(str)/2:]), blink-1, dp)
+		return rec(utils.Num(str[:len(str)/2]), blink-1, dp) + rec(utils.Num(str[len(str)/2:]), blink-1, dp)
 	}
 
 	return rec(n*2024, blink-1, dp)

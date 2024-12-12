@@ -1,7 +1,7 @@
 package main
 
 import (
-	"adventofcode/u"
+	"adventofcode/utils"
 	"fmt"
 	"sync"
 	"sync/atomic"
@@ -17,7 +17,7 @@ type turn struct {
 }
 
 func main() {
-	M := u.ReadFileLines("input.txt")
+	M := utils.ReadLines("input.txt")
 	if len(M) != len(M[0]) {
 		panic("not square")
 	}

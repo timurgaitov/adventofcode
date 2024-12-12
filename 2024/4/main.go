@@ -1,12 +1,12 @@
 package main
 
 import (
-	"adventofcode/u"
+	"adventofcode/utils"
 	"fmt"
 )
 
 func main() {
-	M := u.ReadFileLines("input.txt")
+	M := utils.ReadLines("input.txt")
 	if len(M[0]) != len(M) {
 		panic("not square")
 	}

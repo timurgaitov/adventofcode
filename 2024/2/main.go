@@ -1,16 +1,16 @@
 package main
 
 import (
-	"adventofcode/u"
+	"adventofcode/utils"
 	"fmt"
 	"slices"
 )
 
 func main() {
-	lines := u.ReadFileLines("input.txt")
+	lines := utils.ReadLines("input.txt")
 	count := 0
 	for _, line := range lines {
-		nums := u.Nums(line, " ")
+		nums := utils.Nums(line, " ")
 		for without := 0; without < len(nums); without++ {
 			nums2 := slices.Concat(nums[:without], nums[without+1:])
 			if isStable(nums2) {
@@ -39,7 +39,7 @@ func isStable(nums []int) bool {
 				return false
 			}
 		}
-		diff := u.Abs(nums[i] - prev)
+		diff := utils.Abs(nums[i] - prev)
 		if diff < 1 || diff > 3 {
 			return false
 		}

@@ -1,14 +1,14 @@
 package main
 
 import (
-	"adventofcode/u"
+	"adventofcode/utils"
 	"fmt"
 	"sort"
 	"strings"
 )
 
 func main() {
-	lines := u.ReadFileLines("input.txt")
+	lines := utils.ReadLines("input.txt")
 
 	rules := make(map[int]map[int]struct{})
 	updates := make([][]int, 0)
@@ -19,10 +19,10 @@ func main() {
 			continue
 		}
 		if f {
-			updates = append(updates, u.Nums(line, ","))
+			updates = append(updates, utils.Nums(line, ","))
 		} else {
 			split := strings.Split(line, "|")
-			l, r := u.Num(split[0]), u.Num(split[1])
+			l, r := utils.Num(split[0]), utils.Num(split[1])
 			if rules[l] == nil {
 				rules[l] = make(map[int]struct{})
 			}

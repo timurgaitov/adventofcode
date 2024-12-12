@@ -1,13 +1,12 @@
 package main
 
 import (
-	"adventofcode/u"
 	"fmt"
 	"slices"
 )
 
 func main() {
-	m := u.ReadIntMap("input.txt")
+	m := utils.ReadNumMap("input.txt")
 	sum := 0
 	sum2 := 0
 	for i, line := range m {
@@ -27,7 +26,7 @@ func main() {
 
 var dirs = []pos{{i: -1, j: 0}, {i: 1, j: 0}, {i: 0, j: -1}, {i: 0, j: 1}}
 
-func dfs(m [][]int, i, j int) (int, int) {
+func dfs(m [][]byte, i, j int) (int, int) {
 	stack := make([]pos, 10000)
 	stackCur := 0
 	stack[stackCur] = pos{i: i, j: j, trace: []pos{{i: i, j: j}}}

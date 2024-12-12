@@ -1,22 +1,22 @@
 package main
 
 import (
-	"adventofcode/u"
+	"adventofcode/utils"
 	"fmt"
 )
 
 func main() {
-	chM := u.ReadCharMap("input.txt")
+	chM := utils.ReadCharMap("input.txt")
 
-	q := u.NewQueue()
-	visited := make(map[u.Pos]struct{})
+	q := utils.NewQueue()
+	visited := make(map[utils.Pos]struct{})
 
 	cost := 0
 	cost2 := 0
 
 	for i := range chM {
 		for j := range chM[i] {
-			start := u.Pos{I: i, J: j}
+			start := utils.Pos{I: i, J: j}
 			if _, ok := visited[start]; ok {
 				continue
 			}
@@ -27,14 +27,14 @@ func main() {
 			sides := 0
 
 			for !q.Empty() {
-				cur := q.Remove().(u.Pos)
+				cur := q.Remove().(utils.Pos)
 				if _, ok := visited[cur]; ok {
 					continue
 				}
 				visited[cur] = struct{}{}
 				area++
 
-				for _, dir := range u.DirsSqClockwise {
+				for _, dir := range utils.DirsSqClockwise {
 					pos := posDir(cur, dir)
 					if otherArea(pos, cur, chM) {
 						perimeter++
@@ -57,8 +57,8 @@ func main() {
 	fmt.Println(cost2)
 }
 
-func countConvexCorners(cur u.Pos, chM [][]rune) (corners int) {
-	dirs := u.DirsSqClockwise
+func countConvexCorners(cur utils.Pos, chM [][]byte) (corners int) {
+	dirs := utils.DirsSqClockwise
 	for i := 0; i < len(dirs); i++ {
 		d1 := otherArea(posDir(cur, roundDir(i, dirs)), cur, chM)
 		d2 := otherArea(posDir(cur, roundDir(i+1, dirs)), cur, chM)
@@ -69,8 +69,8 @@ func countConvexCorners(cur u.Pos, chM [][]rune) (corners int) {
 	return
 }
 
-func countConcaveCorners(cur u.Pos, chM [][]rune) (corners int) {
-	dirs := u.DirsDiagClockwise
+func countConcaveCorners(cur utils.Pos, chM [][]byte) (corners int) {
+	dirs := utils.DirsDiagClockwise
 	for i := 0; i < len(dirs); i += 2 {
 		d1 := otherArea(posDir(cur, roundDir(i, dirs)), cur, chM)
 		d2 := otherArea(posDir(cur, roundDir(i+1, dirs)), cur, chM)
@@ -82,18 +82,18 @@ func countConcaveCorners(cur u.Pos, chM [][]rune) (corners int) {
 	return
 }
 
-func roundDir(d int, dirs []u.Pos) u.Pos {
+func roundDir(d int, dirs []utils.Pos) utils.Pos {
 	return dirs[d%len(dirs)]
 }
 
-func posDir(cur u.Pos, dir u.Pos) u.Pos {
-	return u.Pos{
+func posDir(cur utils.Pos, dir utils.Pos) utils.Pos {
+	return utils.Pos{
 		I: cur.I + dir.I,
 		J: cur.J + dir.J,
 	}
 }
 
-func otherArea(p u.Pos, cur u.Pos, chM [][]rune) bool {
+func otherArea[T comparable](p utils.Pos, cur utils.Pos, chM [][]T) bool {
 	return p.I < 0 || p.J < 0 || p.I >= len(chM) || p.J >= len(chM) ||
 		chM[p.I][p.J] != chM[cur.I][cur.J]
 }

@@ -1,14 +1,14 @@
 package main
 
 import (
-	"adventofcode/u"
+	"adventofcode/utils"
 	"fmt"
 )
 
 const empty = -1
 
 func main() {
-	str := u.ReadFileStr("input.txt")
+	str := utils.ReadStr("input.txt")
 
 	unz := unzip(str)
 	ins := 0

@@ -1,4 +1,4 @@
-package u
+package utils
 
 type stack struct {
 	arr []any

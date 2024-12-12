@@ -1,7 +1,7 @@
 package main
 
 import (
-	"adventofcode/u"
+	"adventofcode/utils"
 	"fmt"
 	"iter"
 	"slices"
@@ -15,12 +15,12 @@ type line struct {
 }
 
 func main() {
-	lines := u.ReadFileLines("input.txt")
+	lines := utils.ReadLines("input.txt")
 
 	inp := make([]line, 0, len(lines))
 	for _, lin := range lines {
-		split := u.Strs(lin, ": ")
-		res, nums := u.Num(split[0]), u.Nums(split[1], " ")
+		split := utils.Strings(lin, ": ")
+		res, nums := utils.Num(split[0]), utils.Nums(split[1], " ")
 		inp = append(inp, line{res: res, nums: nums})
 	}
 
@@ -120,5 +120,5 @@ func mul(x, y int) int {
 }
 
 func concat(x, y int) int {
-	return u.Num(fmt.Sprintf("%d%d", x, y))
+	return utils.Num(fmt.Sprintf("%d%d", x, y))
 }
