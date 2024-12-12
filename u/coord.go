@@ -3,9 +3,9 @@ package u
 import "slices"
 
 type Pos struct {
-	i, j int
+	I, J int
 }
 
-var DirsSq = []Pos{{i: -1, j: 0}, {i: 1, j: 0}, {i: 0, j: -1}, {i: 0, j: 1}}
+var DirsSq = []Pos{{I: -1, J: 0}, {I: 1, J: 0}, {I: 0, J: -1}, {I: 0, J: 1}}
 var DirsDiag = slices.Concat(nil, DirsSq,
-	[]Pos{{i: -1, j: -1}, {i: -1, j: 1}, {i: 1, j: 1}, {i: 1, j: -1}})
+	[]Pos{{I: -1, J: -1}, {I: -1, J: 1}, {I: 1, J: 1}, {I: 1, J: -1}})
