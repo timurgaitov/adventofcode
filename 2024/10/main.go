@@ -1,6 +1,7 @@
 package main
 
 import (
+	"adventofcode/utils"
 	"fmt"
 	"slices"
 )
@@ -31,7 +32,7 @@ func dfs(m [][]byte, i, j int) (int, int) {
 	stackCur := 0
 	stack[stackCur] = pos{i: i, j: j, trace: []pos{{i: i, j: j}}}
 
-	count := make(map[lwpos]struct{}, 0)
+	count := make(map[lwpos]struct{})
 	count2 := 0
 
 	for stackCur >= 0 {
