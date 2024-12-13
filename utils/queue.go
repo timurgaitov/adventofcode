@@ -8,7 +8,7 @@ type queue struct {
 
 func NewQueue() *queue {
 	return &queue{
-		arr: make([]any, 10000000000),
+		arr: make([]any, 10000),
 		deq: 0,
 		enq: 0,
 	}

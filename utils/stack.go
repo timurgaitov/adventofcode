@@ -7,7 +7,7 @@ type stack struct {
 
 func NewStack() *stack {
 	return &stack{
-		arr: make([]any, 10000000000),
+		arr: make([]any, 10000),
 		cur: -1,
 	}
 }

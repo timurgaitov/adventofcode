@@ -23,14 +23,26 @@ func main() {
 	lines := utils.ReadLines("input.txt")
 	items := parseItems(lines)
 
-	// Aax + Bbx = px
-	// Aay + Bby = py
+	// A*a.x + B*b.x = p.x
+	// A*a.y + B*b.y = p.y
+	// A? B?
+	// A = (p.y - B*b.y)/a.y					     <- A
+	// (p.y - B*b.y) * a.x/a.y + B*b.x = p.x
+	// p.y*a.x/a.y - B*a.x*b.y/a.y + B*b.x = p.x
+	// B*(b.x - a.x*b.y/a.y) = p.x - p.y*a.x/a.y     | *a.y
+	// B*(a.y*b.x - a.x*b.y) = p.x*a.y - p.y*a.x
+	// B = (p.x*a.y - p.y*a.x)/(a.y*b.x - a.x*b.y)   <- B
 
 	tokens1 := 0
-	tokens2 := 0
+	//tokens2 := 0
 
 	for _, itm := range items {
 		p := itm.Prize
+
+		// part 2
+		p.X += 10000000000000
+		p.Y += 10000000000000
+
 		a := itm.A
 		b := itm.B
 
@@ -40,9 +52,13 @@ func main() {
 		modB := (p.X*a.Y - p.Y*a.X) % (a.Y*b.X - a.X*b.Y)
 		modA := (p.Y - B*b.Y) % a.Y
 
-		if A < 0 || B < 0 /*|| A > 100 || B > 100*/ || modA != 0 || modB != 0 {
+		// part 2
+		if A < 0 || B < 0 || modA != 0 || modB != 0 {
 			continue
 		}
+		//if A < 0 || B < 0 || A > 100 || B > 100 || modA != 0 || modB != 0 {
+		//	continue
+		//}
 
 		tokens1 += 3*A + B
 		//tokens2 += rec(itm)
@@ -52,7 +68,7 @@ func main() {
 	}
 
 	fmt.Println(tokens1)
-	fmt.Println(tokens2)
+	//fmt.Println(tokens2)
 }
 
 func rec(cur item) (ret int) {
@@ -109,10 +125,6 @@ func parseItems(lines []string) []item {
 		lineB := lines[i+1]
 		linePrize := lines[i+2]
 		prize := parseXY(utils.Strings(linePrize, ": ")[1])
-
-		// part 2
-		prize.X += 10000000000000
-		prize.Y += 10000000000000
 
 		items = append(items, item{
 			A:      parseXY(utils.Strings(lineA, ": ")[1]),
