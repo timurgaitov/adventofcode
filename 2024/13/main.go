@@ -23,13 +23,36 @@ func main() {
 	lines := utils.ReadLines("input.txt")
 	items := parseItems(lines)
 
-	tokens := 0
+	// Aax + Bbx = px
+	// Aay + Bby = py
+
+	tokens1 := 0
+	tokens2 := 0
 
 	for _, itm := range items {
-		tokens += rec(itm)
+		p := itm.Prize
+		a := itm.A
+		b := itm.B
+
+		B := (p.X*a.Y - p.Y*a.X) / (a.Y*b.X - a.X*b.Y)
+		A := (p.Y - B*b.Y) / a.Y
+
+		modB := (p.X*a.Y - p.Y*a.X) % (a.Y*b.X - a.X*b.Y)
+		modA := (p.Y - B*b.Y) % a.Y
+
+		if A < 0 || B < 0 /*|| A > 100 || B > 100*/ || modA != 0 || modB != 0 {
+			continue
+		}
+
+		tokens1 += 3*A + B
+		//tokens2 += rec(itm)
+		//if tokens1 != tokens2 {
+		//	fmt.Println("wrong")
+		//}
 	}
 
-	fmt.Println(tokens)
+	fmt.Println(tokens1)
+	fmt.Println(tokens2)
 }
 
 func rec(cur item) (ret int) {
@@ -46,12 +69,12 @@ func rec(cur item) (ret int) {
 		return 0
 	}
 	if cur.Prize.X == 0 && cur.Prize.Y == 0 {
-		println("found")
+		//println("found")
 		return cur.Tokens
 	}
 	//fmt.Println(cur)
-	a := rec(pressButton(cur, cur.A, 1, 0, 3))
-	b := rec(pressButton(cur, cur.B, 0, 1, 1))
+	a := rec(press(cur, cur.A, 1, 0, 3))
+	b := rec(press(cur, cur.B, 0, 1, 1))
 	if a == 0 {
 		return b
 	}
@@ -64,7 +87,7 @@ func rec(cur item) (ret int) {
 	return a
 }
 
-func pressButton(itm item, button xy, pressA, pressB, price int) item {
+func press(itm item, button xy, pressA, pressB, price int) item {
 	return item{
 		A: itm.A,
 		B: itm.B,
@@ -85,10 +108,16 @@ func parseItems(lines []string) []item {
 		lineA := lines[i]
 		lineB := lines[i+1]
 		linePrize := lines[i+2]
+		prize := parseXY(utils.Strings(linePrize, ": ")[1])
+
+		// part 2
+		prize.X += 10000000000000
+		prize.Y += 10000000000000
+
 		items = append(items, item{
 			A:      parseXY(utils.Strings(lineA, ": ")[1]),
 			B:      parseXY(utils.Strings(lineB, ": ")[1]),
-			Prize:  parseXY(utils.Strings(linePrize, ": ")[1]),
+			Prize:  prize,
 			Tokens: 0,
 			Mem:    make(map[xy]int),
 		})
