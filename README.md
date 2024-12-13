@@ -1,7 +1,4 @@
 ## Advent of Code
-
-https://adventofcode.com
-
 ```go
         *
        /|\ 
@@ -14,3 +11,4 @@ https://adventofcode.com
        |||
        |||
 ```
+https://adventofcode.com
