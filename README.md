@@ -1,5 +1,10 @@
-## Advent of Code
-```go
+## Advent of Code 🎄
+
+https://adventofcode.com
+
+‧₊˚🎄‧ ₊˚🦌⊹˚‧
+
+```julia
         *
        /|\ 
       /o o\
@@ -11,4 +16,3 @@
        |||
        |||
 ```
-https://adventofcode.com
