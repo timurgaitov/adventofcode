@@ -6,19 +6,19 @@ import (
 )
 
 func main() {
-	charMap := utils.ReadCharMap("input.txt")
-	if len(charMap) != len(charMap[0]) {
+	byteMap := utils.ReadByteMap("input.txt")
+	if len(byteMap) != len(byteMap[0]) {
 		panic("not square")
 	}
 
-	resMap := make([][]byte, len(charMap))
+	resMap := make([][]byte, len(byteMap))
 	for i := range resMap {
-		resMap[i] = make([]byte, len(charMap))
+		resMap[i] = make([]byte, len(byteMap))
 	}
 
-	for i := 0; i < len(charMap); i++ {
-		for j := 0; j < len(charMap); j++ {
-			markAntinodes(charMap, resMap, i, j)
+	for i := 0; i < len(byteMap); i++ {
+		for j := 0; j < len(byteMap); j++ {
+			markAntinodes(byteMap, resMap, i, j)
 		}
 	}
 
@@ -33,13 +33,13 @@ func main() {
 	fmt.Println(count)
 
 	// part 2
-	resMap2 := make([][]byte, len(charMap))
+	resMap2 := make([][]byte, len(byteMap))
 	for i := range resMap2 {
-		resMap2[i] = make([]byte, len(charMap))
+		resMap2[i] = make([]byte, len(byteMap))
 	}
-	for i := 0; i < len(charMap); i++ {
-		for j := 0; j < len(charMap); j++ {
-			markAntinodes2(charMap, resMap2, i, j)
+	for i := 0; i < len(byteMap); i++ {
+		for j := 0; j < len(byteMap); j++ {
+			markAntinodes2(byteMap, resMap2, i, j)
 		}
 	}
 	count2 := 0
@@ -53,18 +53,18 @@ func main() {
 	fmt.Println(count2)
 }
 
-func markAntinodes(charMap [][]byte, resMap [][]byte, curI, curJ int) {
-	cur := charMap[curI][curJ]
+func markAntinodes(byteMap [][]byte, resMap [][]byte, curI, curJ int) {
+	cur := byteMap[curI][curJ]
 	if cur == '.' {
 		return
 	}
 
-	for i := 0; i < len(charMap); i++ {
-		for j := 0; j < len(charMap); j++ {
+	for i := 0; i < len(byteMap); i++ {
+		for j := 0; j < len(byteMap); j++ {
 			if i == curI && j == curJ {
 				continue
 			}
-			if charMap[i][j] != cur {
+			if byteMap[i][j] != cur {
 				continue
 			}
 			diffI := curI - i
@@ -75,19 +75,19 @@ func markAntinodes(charMap [][]byte, resMap [][]byte, curI, curJ int) {
 	}
 }
 
-func markAntinodes2(charMap [][]byte, resMap [][]byte, curI, curJ int) {
-	cur := charMap[curI][curJ]
+func markAntinodes2(byteMap [][]byte, resMap [][]byte, curI, curJ int) {
+	cur := byteMap[curI][curJ]
 	if cur == '.' {
 		return
 	}
 	resMap[curI][curJ] = '#'
 
-	for i := 0; i < len(charMap); i++ {
-		for j := 0; j < len(charMap); j++ {
+	for i := 0; i < len(byteMap); i++ {
+		for j := 0; j < len(byteMap); j++ {
 			if i == curI && j == curJ {
 				continue
 			}
-			if charMap[i][j] != cur {
+			if byteMap[i][j] != cur {
 				continue
 			}
 			diffI := curI - i

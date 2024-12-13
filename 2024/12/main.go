@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	chM := utils.ReadCharMap("input.txt")
+	byteMap := utils.ReadByteMap("input.txt")
 
 	q := utils.NewQueue()
 	visited := make(map[utils.Pos]struct{})
@@ -14,8 +14,8 @@ func main() {
 	cost := 0
 	cost2 := 0
 
-	for i := range chM {
-		for j := range chM[i] {
+	for i := range byteMap {
+		for j := range byteMap[i] {
 			start := utils.Pos{I: i, J: j}
 			if _, ok := visited[start]; ok {
 				continue
@@ -36,18 +36,18 @@ func main() {
 
 				for _, dir := range utils.DirsSqClockwise {
 					pos := posDir(cur, dir)
-					if otherArea(pos, cur, chM) {
+					if otherArea(pos, cur, byteMap) {
 						perimeter++
 						continue
 					}
 					q.Add(pos)
 				}
 
-				sides += countConvexCorners(cur, chM)
-				sides += countConcaveCorners(cur, chM)
+				sides += countConvexCorners(cur, byteMap)
+				sides += countConcaveCorners(cur, byteMap)
 			}
 
-			//fmt.Printf("%s | area %4d | perimeter %4d | sides %4d\n", chM[start.I][start.J], area, perimeter, sides)
+			//fmt.Printf("%s | area %4d | perimeter %4d | sides %4d\n", byteMap[start.I][start.J], area, perimeter, sides)
 			cost += perimeter * area
 			cost2 += sides * area
 		}
