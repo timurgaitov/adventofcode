@@ -53,7 +53,11 @@ func ReadByteMap(filename string) [][]byte {
 			panic("bad EOL format")
 		}
 	}
-	res := make([][]byte, len(resTmp))
+	lastEmpty := 0
+	if len(resTmp[len(resTmp)-1]) == 0 {
+		lastEmpty = 1
+	}
+	res := make([][]byte, len(resTmp)-lastEmpty)
 	copy(res, resTmp)
 	return res
 }

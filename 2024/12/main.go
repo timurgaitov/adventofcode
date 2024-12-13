@@ -57,11 +57,11 @@ func main() {
 	fmt.Println(cost2)
 }
 
-func countConvexCorners(cur utils.Pos, chM [][]byte) (corners int) {
+func countConvexCorners(cur utils.Pos, byteMap [][]byte) (corners int) {
 	dirs := utils.DirsSqClockwise
 	for i := 0; i < len(dirs); i++ {
-		d1 := otherArea(posDir(cur, roundDir(i, dirs)), cur, chM)
-		d2 := otherArea(posDir(cur, roundDir(i+1, dirs)), cur, chM)
+		d1 := otherArea(posDir(cur, roundDir(i, dirs)), cur, byteMap)
+		d2 := otherArea(posDir(cur, roundDir(i+1, dirs)), cur, byteMap)
 		if d1 && d2 {
 			corners++
 		}
@@ -69,12 +69,12 @@ func countConvexCorners(cur utils.Pos, chM [][]byte) (corners int) {
 	return
 }
 
-func countConcaveCorners(cur utils.Pos, chM [][]byte) (corners int) {
+func countConcaveCorners(cur utils.Pos, byteMap [][]byte) (corners int) {
 	dirs := utils.DirsDiagClockwise
 	for i := 0; i < len(dirs); i += 2 {
-		d1 := otherArea(posDir(cur, roundDir(i, dirs)), cur, chM)
-		d2 := otherArea(posDir(cur, roundDir(i+1, dirs)), cur, chM)
-		d3 := otherArea(posDir(cur, roundDir(i+2, dirs)), cur, chM)
+		d1 := otherArea(posDir(cur, roundDir(i, dirs)), cur, byteMap)
+		d2 := otherArea(posDir(cur, roundDir(i+1, dirs)), cur, byteMap)
+		d3 := otherArea(posDir(cur, roundDir(i+2, dirs)), cur, byteMap)
 		if !d1 && d2 && !d3 {
 			corners++
 		}
@@ -93,7 +93,7 @@ func posDir(cur utils.Pos, dir utils.Pos) utils.Pos {
 	}
 }
 
-func otherArea[T comparable](p utils.Pos, cur utils.Pos, chM [][]T) bool {
-	return p.I < 0 || p.J < 0 || p.I >= len(chM) || p.J >= len(chM) ||
-		chM[p.I][p.J] != chM[cur.I][cur.J]
+func otherArea(p utils.Pos, cur utils.Pos, byteMap [][]byte) bool {
+	return p.I < 0 || p.J < 0 || p.I >= len(byteMap) || p.J >= len(byteMap) ||
+		byteMap[p.I][p.J] != byteMap[cur.I][cur.J]
 }
