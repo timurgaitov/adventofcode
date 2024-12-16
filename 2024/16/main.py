@@ -1,12 +1,14 @@
-import copy
-import sys
 from collections import defaultdict
+from sys import setrecursionlimit
 
-sys.setrecursionlimit(1000000000)
+setrecursionlimit(1000000000)
 
-# 280964
 
-with open('input.txt') as file:
+def apply_dir(a, b):
+  return tuple(map(sum, zip(a, b)))
+
+
+with open('example.txt') as file:
   maze = [list(x) for x in [x.rstrip() for x in file.readlines()]]
 
 for i in range(len(maze)):
@@ -21,37 +23,54 @@ for i in range(len(maze)):
 dirs = [(0, 1), (-1, 0), (0, -1), (1, 0)]
 
 
-def dfs(cur, visited, prev_dir, mem):
-  if (cur, prev_dir) in mem:
-    return mem[(cur, prev_dir)]
+def print_trace(maze, trace):
+  for i in range(len(maze)):
+    for j in range(len(maze[i])):
+      if (i, j) == trace[-1]:
+        print('@', end='')
+        continue
+      if (i, j) in trace:
+        print('o', end='')
+        continue
+      if maze[i][j] == '#':
+        print('█', end='')
+        continue
+      if maze[i][j] in ('E', 'S'):
+        print(maze[i][j], end='')
+        continue
+      print('.', end='')
+    print()
+  print()
+  print()
 
-  if cur in visited:
-    return 1000000000
-  visited.add(cur)
 
-  if maze[cur[0]][cur[1]] == 'E':
-    return 0
+bad_score = 1_000_000_000
+
+
+def dir_cost(cur_dir, d):
+  if cur_dir == d:
+    return 1
+  return 1001
+
+
+def dfs(cur, cur_dir, trace, mem, target):
+  if cur in trace:
+    return bad_score
 
   if maze[cur[0]][cur[1]] == '#':
-    return 1000000000
+    return bad_score
 
-  min_score = 1000000000
+  if maze[cur[0]][cur[1]] == target:
+    return 0
 
-  for dir in dirs:
-    if dir[0] + prev_dir[0] == 0 and dir[1] + prev_dir[1] == 0:
-      continue
+  trace.add(cur)
+  score = min(
+      [dir_cost(cur_dir, d) + dfs(apply_dir(cur, d), d, trace, mem, target) for
+       d in dirs])
+  trace.remove(cur)
 
-    change = 1
-    if dir != prev_dir:
-      change += 1000
-
-    score = change + dfs((cur[0] + dir[0], cur[1] + dir[1]), copy.copy(visited),
-                         dir, mem)
-    if score < min_score:
-      min_score = score
-
-  mem[(cur, prev_dir)] = min_score
-  return min_score
+  return score
 
 
-print(dfs(S, set(), dirs[0], defaultdict()))
+print(dfs(S, dirs[0], set(), defaultdict(), 'E'))
+print(dfs(E, dirs[3], set(), defaultdict(), 'S'))
