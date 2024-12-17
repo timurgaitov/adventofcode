@@ -1,14 +1,11 @@
 from collections import defaultdict
+from heapq import heappush, heappop
+from math import inf
 from sys import setrecursionlimit
 
 setrecursionlimit(1000000000)
 
-
-def apply_dir(a, b):
-  return tuple(map(sum, zip(a, b)))
-
-
-with open('example.txt') as file:
+with open('input.txt') as file:
   maze = [list(x) for x in [x.rstrip() for x in file.readlines()]]
 
 for i in range(len(maze)):
@@ -23,54 +20,38 @@ for i in range(len(maze)):
 dirs = [(0, 1), (-1, 0), (0, -1), (1, 0)]
 
 
-def print_trace(maze, trace):
-  for i in range(len(maze)):
-    for j in range(len(maze[i])):
-      if (i, j) == trace[-1]:
-        print('@', end='')
+def sum_tup(pos, d):
+  return pos[0] + d[0], pos[1] + d[1]
+
+
+def find_path(start, start_dir, target):
+  dist = defaultdict(lambda: inf)
+
+  pq = []
+  heappush(pq, (0, start, start_dir))
+
+  while len(pq) > 0:
+    cost, cur, cur_dir = heappop(pq)
+
+    if maze[cur[0]][cur[1]] == '#':
+      continue
+
+    if cost >= dist[cur]:
+      continue
+    dist[cur] = cost
+
+    for d in dirs:
+      if sum_tup(cur_dir, d) == (0, 0):
         continue
-      if (i, j) in trace:
-        print('o', end='')
+
+      if d != cur_dir:
+        heappush(pq, (dist[cur] + 1001, sum_tup(cur, d), d))
         continue
-      if maze[i][j] == '#':
-        print('█', end='')
-        continue
-      if maze[i][j] in ('E', 'S'):
-        print(maze[i][j], end='')
-        continue
-      print('.', end='')
-    print()
-  print()
-  print()
+
+      heappush(pq, (dist[cur] + 1, sum_tup(cur, d), d))
+
+  return dist[target]
 
 
-bad_score = 1_000_000_000
-
-
-def dir_cost(cur_dir, d):
-  if cur_dir == d:
-    return 1
-  return 1001
-
-
-def dfs(cur, cur_dir, trace, mem, target):
-  if cur in trace:
-    return bad_score
-
-  if maze[cur[0]][cur[1]] == '#':
-    return bad_score
-
-  if maze[cur[0]][cur[1]] == target:
-    return 0
-
-  trace.add(cur)
-  score = min(
-      [dir_cost(cur_dir, d) + dfs(apply_dir(cur, d), d, trace, mem, target) for
-       d in dirs])
-  trace.remove(cur)
-
-  return score
-
-
-print(dfs(S, dirs[0], set(), defaultdict(), 'E'))
-print(dfs(E, dirs[3], set(), defaultdict(), 'S'))
+print(find_path(S, dirs[0], E))
+# print(find_path(E, dirs[3], S))
