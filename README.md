@@ -1,10 +1,6 @@
-## Advent of Code 🎄
+### [<span style="color:yellow">Advent of Code</span>](https://adventofcode.com) 🎄
 
-https://adventofcode.com
-
-‧₊˚🎄‧ ₊˚🦌⊹˚‧
-
-```julia
+```python
         *
        /|\ 
       /o o\
@@ -13,6 +9,8 @@ https://adventofcode.com
    /  |*|*|  \
   / o | | | o \
  /____|_|_|____\
-       |||
-       |||
+      |||||
+      | | |
+       | |
+        |
 ```
