@@ -6,14 +6,11 @@ with open('input.txt') as file:
   blocks = [(int(c[0]), int(c[1])) for c in [str_c.rstrip().split(',') for str_c
                                              in file.readlines()]]
 
-# size = 7
 size = 71
-# fallen = 12
-fallen = 1024
 
 space = [[0 for x in range(size)] for y in range(size)]
 
-for b in blocks[:fallen]:
+for b in blocks[:1024]:
   if b[0] < 0 or b[0] >= size or b[1] < 0 or b[1] >= size:
     continue
 
@@ -26,7 +23,7 @@ def mov(pos, d):
   return pos[0] + d[0], pos[1] + d[1]
 
 
-def find_path(start):
+def find_path(space_t, start):
   dist = defaultdict(lambda: inf)
 
   pq = []
@@ -38,7 +35,7 @@ def find_path(start):
     if cur[0] < 0 or cur[0] >= size or cur[1] < 0 or cur[1] >= size:
       continue
 
-    if space[cur[0]][cur[1]] == 1:
+    if space_t[cur[0]][cur[1]] == 1:
       continue
 
     if cost >= dist[cur]:
@@ -51,5 +48,17 @@ def find_path(start):
   return dist
 
 
-dist0 = find_path((0, 0))
-print(dist0[(size - 1, size - 1)])
+dist = find_path(space, (0, 0))
+print(dist[(size - 1, size - 1)])
+
+# part 2
+space2 = [[0 for x in range(size)] for y in range(size)]
+
+for b in blocks:
+  if b[0] < 0 or b[0] >= size or b[1] < 0 or b[1] >= size:
+    continue
+  space2[b[1]][b[0]] = 1
+  dist2 = find_path(space2, (0, 0))
+  if dist2[(size - 1, size - 1)] == inf:
+    print(b)
+    break
