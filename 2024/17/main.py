@@ -80,7 +80,7 @@ print(','.join([str(x) for x in proc[4]]))
 
 
 # part 2
-# guessing three bits erased by modulo
+# guessing three bits erased by division
 def find_a(backw_i, a):
   if backw_i < 0:
     return a
