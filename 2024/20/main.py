@@ -3,10 +3,11 @@ from collections import defaultdict
 from heapq import heappush, heappop
 from math import inf
 
-with open('example.txt') as file:
+with open('input.txt') as file:
   track = [list(x) for x in file.read().splitlines()]
 
-for i, j in itertools.product(range(len(track)), repeat=2):
+size = len(track)
+for i, j in itertools.product(range(size), repeat=2):
   if track[i][j] == 'E':
     E = (i, j)
   elif track[i][j] == 'S':
@@ -20,38 +21,57 @@ def mov(pos, d):
 
 
 def find_path(_map, _start):
-  _dist = defaultdict(lambda: defaultdict(lambda: inf))
+  _dist = defaultdict(lambda: inf)
 
   pq = []
-  heappush(pq, (0, _start, (0, 0)))
+  heappush(pq, (0, _start))
 
   while len(pq) > 0:
-    cost, cur, cheat = heappop(pq)
-
-    if (cur[0] == 0 or cur[1] == 0
-        or cur[0] == len(_map) - 1 or cur[1] == len(_map) - 1):
-      continue
+    cost, cur = heappop(pq)
 
     if _map[cur[0]][cur[1]] == '#':
-      if cheat != (0, 0):
-        continue
-      cheat = cur
-
-    if cost >= _dist[cheat][cur]:
       continue
-    _dist[cheat][cur] = cost
+
+    if cost >= _dist[cur]:
+      continue
+    _dist[cur] = cost
 
     for d in dirs:
-      heappush(pq, (_dist[cheat][cur] + 1, mov(cur, d), cheat[:]))
+      heappush(pq, (_dist[cur] + 1, mov(cur, d)))
 
   return _dist
 
 
-dist = find_path(track, S)
+dist_E_to_others = find_path(track, E)
+dist_S_to_others = find_path(track, S)
 
 count = 0
-for _, v in dist.items():
-  if v[E] <= dist[(0, 0)][E] - 2:
+
+for i, j in itertools.product(range(1, size - 1), repeat=2):
+  if track[i][j] != '#':
+    continue
+
+  left = mov((i, j), dirs[2])
+  right = mov((i, j), dirs[0])
+  top = mov((i, j), dirs[1])
+  bottom = mov((i, j), dirs[3])
+
+  saved = 100
+
+  if dist_E_to_others[left] + dist_S_to_others[right] + 2 <= dist_S_to_others[
+    E] - saved:
+    count += 1
+
+  if dist_E_to_others[right] + dist_S_to_others[left] + 2 <= dist_S_to_others[
+    E] - saved:
+    count += 1
+
+  if dist_E_to_others[top] + dist_S_to_others[bottom] + 2 <= dist_S_to_others[
+    E] - saved:
+    count += 1
+
+  if dist_E_to_others[bottom] + dist_S_to_others[top] + 2 <= dist_S_to_others[
+    E] - saved:
     count += 1
 
 print(count)
