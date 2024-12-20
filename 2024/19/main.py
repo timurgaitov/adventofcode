@@ -24,3 +24,24 @@ for d in des:
     count += 1
 
 print(count)
+
+
+# part 2
+
+@cache
+def rec2(d):
+  if d == '':
+    return 1
+  c = 0
+  for i in range(1, len(d) + 1):
+    if d[:i] in pat:
+      c += rec2(d[i:])
+  return c
+
+
+count2 = 0
+
+for d in des:
+  count2 += rec2(d)
+
+print(count2)
