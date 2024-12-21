@@ -1,3 +1,6 @@
+from functools import cache
+from math import inf
+
 with open('input.txt') as file:
   lines = file.read().splitlines()
 
@@ -26,11 +29,9 @@ arrow_coords = {
 }
 
 
-def mov(cur, target, depth):
-  if depth == 0:
-    coords = num_coords
-  else:
-    coords = arrow_coords
+@cache
+def mov(cur, target, use_num):
+  coords = num_coords if use_num else arrow_coords
 
   moves = set()
 
@@ -77,26 +78,31 @@ def mov(cur, target, depth):
   return moves
 
 
+@cache
 def rec(str, depth):
-  if depth == 3:
-    return str
+  if depth == 26:
+    return len(str)
   cur = 'A'
-  seq = ''
+  seq_len = 0
   for c in str:
-    moves = sorted(
-        [rec(move + 'A', depth + 1) for move in mov(cur, c, depth)],
-        key=len)
-    if len(moves) == 0:
-      seq += 'A'
+    if c == cur:
+      seq_len += 1
       continue
-    seq += moves[0]
+
+    min_len = inf
+    for move in mov(cur, c, depth == 0):
+      subseq_len = rec(move + 'A', depth + 1)
+      if subseq_len < min_len:
+        min_len = subseq_len
+
+    seq_len += min_len
     cur = c
-  return seq
+  return seq_len
 
 
 def solv(line):
-  str = rec(line, 0)
-  return len(str) * int(line[:-1])
+  seq_len = rec(line, 0)
+  return seq_len * int(line[:-1])
 
 
 print(sum([solv(line) for line in lines]))
