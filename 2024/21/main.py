@@ -1,4 +1,4 @@
-with open('example.txt') as file:
+with open('input.txt') as file:
   lines = file.read().splitlines()
 
 num_coords = {
@@ -26,9 +26,16 @@ arrow_coords = {
 }
 
 
-def mov(cur, target, coords):
+def mov(cur, target, depth):
+  if depth == 0:
+    coords = num_coords
+  else:
+    coords = arrow_coords
+
+  moves = set()
+
   if cur == target:
-    return ''
+    return moves
 
   cc = coords[cur]
   nc = coords[target]
@@ -50,27 +57,45 @@ def mov(cur, target, coords):
   else:
     hor = ''
 
-  if (cc[0] - di, cc[1]) == coords['(x_x)']:
-    moves = hor + ver
-  else:
-    moves = ver + hor
+  if ver == '' and hor == '':
+    return moves
+
+  if ver == '':
+    moves.add(hor)
+    return moves
+
+  if hor == '':
+    moves.add(ver)
+    return moves
+
+  if (cc[0] - di, cc[1]) != coords['(x_x)']:
+    moves.add(ver + hor)
+
+  if (cc[0], cc[1] - dj) != coords['(x_x)']:
+    moves.add(hor + ver)
 
   return moves
 
 
-def rec(str, coords, depth):
-  if depth == 0:
+def rec(str, depth):
+  if depth == 3:
     return str
   cur = 'A'
   seq = ''
   for c in str:
-    seq += mov(cur, c, coords) + 'A'
+    moves = sorted(
+        [rec(move + 'A', depth + 1) for move in mov(cur, c, depth)],
+        key=len)
+    if len(moves) == 0:
+      seq += 'A'
+      continue
+    seq += moves[0]
     cur = c
-  return rec(seq, coords, depth - 1)
+  return seq
 
 
 def solv(line):
-  str = rec(rec(line, num_coords, 1), arrow_coords, 2)
+  str = rec(line, 0)
   return len(str) * int(line[:-1])
 
 
