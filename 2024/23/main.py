@@ -27,3 +27,32 @@ for comp, conns in net.items():
       res.add(tuple(three))
 
 print(len(res))
+
+# part 2
+
+max_ic = set()
+visited = set()
+
+for comp, conns in net.items():
+  ic = set()
+  ic.add(comp)
+
+  st = set()
+  st |= conns
+  while len(st) > 0:
+    cur = st.pop()
+    if cur in ic:
+      continue
+    diff = ic.difference(net[cur])
+    if len(diff) > 0:
+      continue
+    ic.add(cur)
+    st |= net[cur].difference(ic)
+
+  if len(ic) > len(max_ic):
+    max_ic = ic
+
+  visited |= ic
+
+print(len(max_ic))
+print(','.join(sorted(max_ic)))
